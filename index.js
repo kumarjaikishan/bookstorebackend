@@ -4,10 +4,13 @@ const app = express();
 const user = require('./controller/user_controller')
 const emailauth = require('./middleware/email_auth')
 const authmiddlewre = require('./middleware/auth_middleware')
+const isadmin = require('./middleware/isadmin_middleware')
+const isauthor = require('./middleware/isauthor_middleware')
 require('./conn/conn');
 const errorHandle = require('./utils/error_util');
 const author = require('./controller/aurthor_controller')
 const retailer = require('./controller/retailer_contorller')
+const admin = require('./controller/admin_controller')
 const router = express.Router();
 const port = process.env.PORT || 5000;
 
@@ -32,9 +35,11 @@ router.route('/buybook/:bookid').post(authmiddlewre,retailer.buybook);
 router.route('/deletebook').post(retailer.deletebook);  
 router.route('/getpurchasebook').get(authmiddlewre,retailer.getpurchasebook);  
 
+router.route('/getusers').get(authmiddlewre,isadmin,admin.getusers);  
+router.route('/edituser').post(authmiddlewre,isadmin,admin.edituser);  
 
-router.route('/getaurthorbooks').get(authmiddlewre,author.getAurthorBook);  
-router.route('/createaurthorbooks').post(authmiddlewre,author.createAurthorBook);  
+router.route('/getaurthorbooks').get(authmiddlewre,isauthor,author.getAurthorBook);  
+router.route('/createaurthorbooks').post(authmiddlewre,isauthor,author.createAurthorBook);  
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Route not found, kindly Re-Check api End point' });

@@ -4,7 +4,7 @@ const purchase = require('../modals/purchase_schema');
 const getAurthorBook = async (req, res, next) => {
     try {
         const query = await book.find({ creator: req.userid }).sort({createdAt: -1});
-        const booksale = await purchase.find({authorId:req.userid}).sort({createdAt: -1}).populate({
+        const booksale = await purchase.find({authorId:req.userid}).sort({purchaseDate: -1}).populate({
             path: 'buyerId',
             select: 'name' 
         }).populate({

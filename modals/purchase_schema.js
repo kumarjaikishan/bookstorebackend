@@ -24,6 +24,11 @@ const purchaseSchema = new mongo.Schema({
         type: String,
         required: false,
         default:'',
+        unique:true
+    },
+    purchaseDate: {
+        type: String,
+        required: true,
     },
     price: {
         type: Number,

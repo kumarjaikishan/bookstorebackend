@@ -23,17 +23,7 @@ const login = async (req, res, next) => {
         return next({ status: 400, message: "All Fields are Required" });
     }
 
-    let usersdata;
-    if (myCache.has("allusers")) {
-        usersdata = JSON.parse(myCache.get("allusers"));
-    } else {
-        usersdata = await user.find({});
-        myCache.set("allusers", JSON.stringify(usersdata));
-    }
-
-    const result = await usersdata.find((hel) => {
-        return hel.email == req.body.email
-    });
+    const result = await user.findOne({email:email});
     //    console.log("result",result);
     if (!result) {
         return next({ status: 400, message: "User not found" });
@@ -67,7 +57,7 @@ const login = async (req, res, next) => {
             msg: "Login Successful",
             token: dfg,
             userId: fbf,
-            isadmin: result.isadmin
+            userType: result.user_type
         });
 
     } else {

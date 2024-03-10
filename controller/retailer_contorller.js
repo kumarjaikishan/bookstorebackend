@@ -72,7 +72,7 @@ const deletebook = async (req, res, next) => {
 
 const getpurchasebook = async (req, res, next) => {
     try {
-        const query = await purchase.find({ buyerId:req.userid}).sort({createdAt:-1}).populate({
+        const query = await purchase.find({ buyerId:req.userid}).sort({purchaseDate:-1}).populate({
             path: 'bookId', 
             select: 'book_title author_name slug_value' // Specify the fields you want to select from the 'User' model
         });
@@ -90,9 +90,12 @@ const getpurchasebook = async (req, res, next) => {
 const buybook = async (req, res, next) => {
     const bookId = req.params.bookid;
     const coupon = req.body.coupon;
+    const buydate = req.body.date;
+    // console.log(buydate);
     if (bookId == "") {
         return next({ status: 400, message: "please send book ID" });
     }
+
 
     try {
         const lastPurchase = await purchase.findOne().sort({ createdAt: -1 }); //to findout last unique ID
@@ -107,12 +110,12 @@ const buybook = async (req, res, next) => {
         }
 
         if (lastPurchase) {
-            let purchaseID = GeneratePurchaseId(lastPurchase.purchaseId);
-            const newPurchase = new purchase({authorId:bookselected.creator ,bookId:bookObjectIdId, bookUniqueId:bookId, buyerId: req.userid, purchaseId: purchaseID, price: finalprice });
+            let purchaseID = GeneratePurchaseId(lastPurchase.purchaseId,buydate);
+            const newPurchase = new purchase({authorId:bookselected.creator ,bookId:bookObjectIdId,purchaseDate:buydate, bookUniqueId:bookId, buyerId: req.userid, purchaseId: purchaseID, price: finalprice });
             const result = await newPurchase.save();
         } else {
-            let firstId = currentyearandmonth();
-            const newPurchase = new purchase({authorId:bookselected.creator ,bookId:bookObjectIdId,bookUniqueId:bookId, buyerId: req.userid, purchaseId: firstId, price: finalprice });
+            let firstId = currentyearandmonth(buydate);
+            const newPurchase = new purchase({authorId:bookselected.creator ,bookId:bookObjectIdId,purchaseDate:buydate,bookUniqueId:bookId, buyerId: req.userid, purchaseId: firstId, price: finalprice });
             const result = await newPurchase.save();
         }
 
@@ -126,13 +129,14 @@ const buybook = async (req, res, next) => {
         return next({ status: 500, message: error });
     }
 }
-const GeneratePurchaseId = (lastPurchaseId) => {
+const GeneratePurchaseId = (lastPurchaseId,buydate) => {
     let purchaseId = '';
     let splite = lastPurchaseId.split('-');
     let lastno = splite[2];
     let lastdate = splite[0] + '-' + splite[1]; // findout last purchase year and month
 
-    const date = new Date();
+    // const date = new Date(); // use this for auto pick today date
+    const date = new Date(buydate);
     let currentyear = date.getFullYear().toString();
     let currentmonth = pad(date.getMonth() + 1);
     let currentdate = currentyear + '-' + currentmonth; // getting present year and month
@@ -142,9 +146,10 @@ const GeneratePurchaseId = (lastPurchaseId) => {
     } else {
         purchaseId = currentdate + "-1"; // updating if purcahse made in different year or month
     }
+    // console.log(purchaseId);
     return purchaseId;
 }
-const currentyearandmonth = () => {
+const currentyearandmonth = (customdate) => {
     const date = new Date();
     let currentyear = date.getFullYear().toString();
     let currentmonth = pad(date.getMonth() + 1);
