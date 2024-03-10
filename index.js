@@ -28,14 +28,16 @@ router.route('/verify').get(user.verify);
 
 router.route('/getbooks').get(retailer.getbooks);  
 router.route('/getbook/:bookid').get(retailer.getbook);  
-router.route('/buybook').post(retailer.buybook);  
+router.route('/buybook/:bookid').post(authmiddlewre,retailer.buybook);  
+router.route('/deletebook').post(retailer.deletebook);  
+router.route('/getpurchasebook').get(authmiddlewre,retailer.getpurchasebook);  
 
 
 router.route('/getaurthorbooks').get(authmiddlewre,author.getAurthorBook);  
 router.route('/createaurthorbooks').post(authmiddlewre,author.createAurthorBook);  
 
 app.use((req, res, next) => {
-    res.status(404).json({ msg: 'Route not found, kindly Re-Check api End point' });
+    res.status(404).json({ message: 'Route not found, kindly Re-Check api End point' });
   });
 
 app.listen(port, () => {

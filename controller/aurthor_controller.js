@@ -1,13 +1,22 @@
 const book = require('../modals/book_schema');
+const purchase = require('../modals/purchase_schema');
 
 const getAurthorBook = async (req, res, next) => {
     try {
-        const query = await book.find({ creator: req.userid });
+        const query = await book.find({ creator: req.userid }).sort({createdAt: -1});
+        const booksale = await purchase.find({authorId:req.userid}).sort({createdAt: -1}).populate({
+            path: 'buyerId',
+            select: 'name' 
+        }).populate({
+            path: 'bookId',
+            select: 'book_title' 
+        })
         if (!query) {
             return next({ status: 400, message: "Books not found" });
         }
         res.status(200).json({
-            data: query
+            data: query,
+            salerecord:booksale
         })
     } catch (error) {
         console.log(error);

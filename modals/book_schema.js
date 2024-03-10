@@ -31,6 +31,11 @@ const bookschema = new mongo.Schema({
     price:{
         type: Number,
         required: true,
+    },
+    sellCount:{
+        type: Number,
+        required: false,
+        default:0
     }
    
 }, { timestamps: true })
