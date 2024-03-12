@@ -1,22 +1,24 @@
 const book = require('../modals/book_schema');
 const purchase = require('../modals/purchase_schema');
+const moment = require('moment');
+const sendmail = require('../utils/sendemail')
 
 const getAurthorBook = async (req, res, next) => {
     try {
-        const query = await book.find({ creator: req.userid }).sort({createdAt: -1});
-        const booksale = await purchase.find({authorId:req.userid}).sort({purchaseDate: -1}).populate({
+        const query = await book.find({ creator: req.userid }).sort({ createdAt: -1 });
+        const booksale = await purchase.find({ authorId: req.userid }).sort({ purchaseId: -1 }).populate({
             path: 'buyerId',
-            select: 'name' 
+            select: 'name'
         }).populate({
             path: 'bookId',
-            select: 'book_title' 
+            select: 'book_title'
         })
         if (!query) {
             return next({ status: 400, message: "Books not found" });
         }
         res.status(200).json({
             data: query,
-            salerecord:booksale
+            salerecord: booksale
         })
     } catch (error) {
         console.log(error);
@@ -25,29 +27,37 @@ const getAurthorBook = async (req, res, next) => {
 }
 const createAurthorBook = async (req, res, next) => {
     // console.log(req.body);
-    const { book_title, author_name, price, description } = req.body
+    let { book_title, author_name, price, description } = req.body
     if (book_title == "" || author_name == "" || price == "" || description == "") {
         return next({ status: 400, message: "All fields are Required" });
     }
     if (price > 1000 || price < 100) {
         return next({ status: 400, message: "Price must between 100 and 1000" });
     }
-    const checkprevoius= await book.findOne().sort({createdAt:-1});
-    // console.log(checkprevoius);
-    let bookId="";
-    if(!checkprevoius){
-        bookId= 'book-1';
-    }else{
-        let lastBookNumber= parseInt(checkprevoius.bookId.split('-')[1])
-        let latestnumber = lastBookNumber+ 1;
-        bookId= "book-"+latestnumber;
-    }
-
-    let newtitle =  book_title.trim();
-    let slug = newtitle.replaceAll(' ','')
-    let slug2 = newtitle.replaceAll(' ','-')
+    book_title = book_title.replace(/\s+/g, ' ').trim().toLowerCase();
+    //  console.log(book_title);
     try {
-        const newUser = new book({ creator: req.userid,bookId,slug_value:slug2 ,book_title:newtitle, author_name, price, description });
+        const checkbooktitle = await book.findOne({ book_title})
+        // console.log(checkbooktitle);
+        if (checkbooktitle) {
+            return next({ status: 400, message: "Book Title Already Exists" });
+        }
+        const checkprevoius = await book.findOne().sort({ createdAt: -1 });
+        // console.log(checkprevoius);
+        let bookId = "";
+        if (!checkprevoius) {
+            bookId = 'book-1';
+        } else {
+            let lastBookNumber = parseInt(checkprevoius.bookId.split('-')[1])
+            let latestnumber = lastBookNumber + 1;
+            bookId = "book-" + latestnumber;
+        }
+
+        let newtitle = book_title;
+        let slug = newtitle.replaceAll(' ', '')
+        let slug2 = newtitle.replaceAll(' ', '-')
+
+        const newUser = new book({ creator: req.userid, bookId, slug_value: slug2, book_title: newtitle, author_name, price, description });
         const result = await newUser.save();
 
         return res.status(201).json({
@@ -59,4 +69,60 @@ const createAurthorBook = async (req, res, next) => {
     }
 }
 
-module.exports = { getAurthorBook, createAurthorBook };
+const revenuedetail = async (req, res, next) => {
+    const query = await purchase.find({ authorId: req.userid });
+    // console.log(query);
+
+    let currentmonth = 0;
+    let currentyear = 0;
+    let total = 0
+
+    // Get the current date
+    const currentDate = moment();
+    const currentDate2 = moment();
+    const currentDate3 = moment();
+    const currentDate4 = moment();
+
+    const startOfMonth = currentDate.startOf('month');
+    const endOfMonth = currentDate2.endOf('month');
+    const startOfYear = currentDate3.startOf('year');
+    const endOfYear = currentDate4.endOf('year');
+
+    // Format the dates if needed
+    const formattedStartOfMonth = startOfMonth.format('YYYY-MM-DD');
+    const formattedEndOfMonth = endOfMonth.format('YYYY-MM-DD');
+    const formattedstartofyear = startOfYear.format('YYYY-MM-DD');
+    const formattedEndofyear = endOfYear.format('YYYY-MM-DD');
+
+    // console.log('Start of the current month:', formattedStartOfMonth);
+    // console.log('End of the current month:', formattedEndOfMonth);
+    // console.log('start of the current year:', formattedstartofyear);
+    // console.log('End of the current year:', formattedEndofyear);
+
+    query.map((val, ind) => {
+        if (val.purchaseDate >= formattedStartOfMonth && val.purchaseDate <= formattedEndOfMonth) {
+            currentmonth += val.price
+        }
+        if (val.purchaseDate >= formattedstartofyear && val.purchaseDate <= formattedEndofyear) {
+            currentyear += val.price
+        }
+        total += val.price;
+        return val;
+    })
+    const message = `Dear Author ${req.user.name}, your this month sale is - Rs.${currentmonth}.00 , this year sale is -
+     Rs.${currentyear}.00 and the Total sale is -Rs.${total}.00 till now, `
+
+    // console.log(currentmonth, currentyear, total);
+    try {
+        await sendmail(req.user.email, message);
+        return res.status(200).json({
+            message: "Stat Email sent"
+        })
+    } catch (error) {
+        console.log(error);
+        return next({ status: 500, message: error });
+    }
+
+}
+
+module.exports = { revenuedetail, getAurthorBook, createAurthorBook };

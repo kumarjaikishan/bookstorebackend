@@ -32,6 +32,16 @@ const bookschema = new mongo.Schema({
         type: Number,
         required: true,
     },
+    rating:{
+        type: Number,
+        required: false,
+        default:0
+    },
+    Noofrating: {
+        type: Number,
+        required: false,
+        default:0,
+    },
     sellCount:{
         type: Number,
         required: false,

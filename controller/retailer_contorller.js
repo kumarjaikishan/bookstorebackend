@@ -1,5 +1,8 @@
 const book = require('../modals/book_schema');
 const purchase = require('../modals/purchase_schema');
+const mongoose = require('mongoose');
+const sendmail = require('../utils/sendemail');
+const revenuedetail = require('../utils/stat_email');
 
 const getbooks = async (req, res, next) => {
     try {
@@ -33,6 +36,24 @@ const getbook = async (req, res, next) => {
         return next({ status: 500, message: error });
     }
 }
+const bookdetail = async (req, res, next) => {
+    const bookId = req.params.bookid;
+    console.log('Book ID:', bookId);
+    if (bookId == "") {
+        return next({ status: 400, message: "please send book ID" });
+    }
+    try {
+        const query = await book.findOne({slug_value:bookId });
+        if (!query) {
+            return next({ status: 400, message: "Book not Found" });
+        }
+        res.status(200).json({
+            data: query
+        })
+    } catch (error) {
+        return next({ status: 500, message: error });
+    }
+}
 const buybooks = async (req, res, next) => {
     const bookId = req.params.bookid;
     // console.log('Book ID:', bookId);
@@ -58,12 +79,12 @@ const deletebook = async (req, res, next) => {
         return next({ status: 400, message: "please send book ID" });
     }
     try {
-        const query = await book.findByIdAndDelete({ _id:bookId });
+        const query = await book.findByIdAndDelete({ _id: bookId });
         if (!query) {
             return next({ status: 400, message: "Book Id is not Valid" });
         }
         res.status(200).json({
-           message:'Book Deleted Successfully'
+            message: 'Book Deleted Successfully'
         })
     } catch (error) {
         return next({ status: 500, message: error });
@@ -72,15 +93,15 @@ const deletebook = async (req, res, next) => {
 
 const getpurchasebook = async (req, res, next) => {
     try {
-        const query = await purchase.find({ buyerId:req.userid}).sort({purchaseDate:-1}).populate({
-            path: 'bookId', 
-            select: 'book_title author_name slug_value' // Specify the fields you want to select from the 'User' model
+        const query = await purchase.find({ buyerId: req.userid }).sort({ purchaseDate: -1 }).populate({
+            path: 'bookId',
+            select: 'book_title author_name slug_value rating' // Specify the fields you want to select from the 'User' model
         });
         if (!query) {
             return next({ status: 400, message: "No purchase found" });
         }
         res.status(200).json({
-           data:query
+            data: query
         })
     } catch (error) {
         return next({ status: 500, message: error });
@@ -91,17 +112,30 @@ const buybook = async (req, res, next) => {
     const bookId = req.params.bookid;
     const coupon = req.body.coupon;
     const buydate = req.body.date;
+
+    const date = new Date(buydate);
+    let buyyear = date.getFullYear().toString();
+    let buymonth = String(date.getMonth() + 1).padStart(2, '0');
+
     // console.log(buydate);
     if (bookId == "") {
         return next({ status: 400, message: "please send book ID" });
     }
 
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
-        const lastPurchase = await purchase.findOne().sort({ createdAt: -1 }); //to findout last unique ID
-        const bookselected = await book.findOne({ bookId }); // to findout book price
+        const latestpurchase = await purchase.findOne({ purchaseId: { $regex: `${buyyear}-${buymonth}-\\d+` } })
+            .sort({ purchaseId: -1 })
+            .limit(1);
+
+        const bookselected = await book.findOne({ bookId }).populate({
+            path: 'creator',
+            select: 'name email'
+        }); // to findout book price
         const finalprice = bookselected.price;
-        const bookObjectIdId= bookselected._id
+        const bookObjectIdId = bookselected._id
 
 
         if (coupon != "") {
@@ -109,62 +143,42 @@ const buybook = async (req, res, next) => {
             finalprice = bookselected.price - coupon.amount;
         }
 
-        if (lastPurchase) {
-            let purchaseID = GeneratePurchaseId(lastPurchase.purchaseId,buydate);
-            const newPurchase = new purchase({authorId:bookselected.creator ,bookId:bookObjectIdId,purchaseDate:buydate, bookUniqueId:bookId, buyerId: req.userid, purchaseId: purchaseID, price: finalprice });
-            const result = await newPurchase.save();
-        } else {
-            let firstId = currentyearandmonth(buydate);
-            const newPurchase = new purchase({authorId:bookselected.creator ,bookId:bookObjectIdId,purchaseDate:buydate,bookUniqueId:bookId, buyerId: req.userid, purchaseId: firstId, price: finalprice });
-            const result = await newPurchase.save();
+        let increment = 1;
+        if (latestpurchase) {
+            const latestCounter = parseInt(latestpurchase.purchaseId.split('-')[2]);
+            increment = latestCounter + 1;
         }
+        const purchaseId = `${buyyear}-${buymonth}-${increment}`;
+        // console.log("purchase iD",purchaseId);
 
-        await book.findOneAndUpdate({ bookId },{sellCount :bookselected.sellCount + 1 }) // updating sellcount
+
+        const newPurchase = new purchase({ authorId: bookselected.creator, bookId: bookObjectIdId, purchaseDate: buydate, bookUniqueId: bookId, buyerId: req.userid, purchaseId, price: finalprice });
+        const result = await newPurchase.save();
+
+
+        await book.findOneAndUpdate({ bookId }, { $inc: { sellCount: 1 } }); // updating book sellcount
+
+        await session.commitTransaction();
+        session.endSession();
+
+        const message = `Hey ${bookselected.creator.name}, recently your book-${bookselected.book_title} is purchased by ${req.user.name} for Rs.${finalprice}`
+
+        await sendmail(bookselected.creator.email, message);
+        // await revenuedetail(bookselected.creator.name,bookselected.creator.email) ; // if you want to send stat email on every bokk sale to author
+
         return res.status(201).json({
             message: "Book Buy Successfully"
         })
 
     } catch (error) {
         console.log(error.message);
+
+        await session.abortTransaction();
+        session.endSession();
+
         return next({ status: 500, message: error });
     }
 }
-const GeneratePurchaseId = (lastPurchaseId,buydate) => {
-    let purchaseId = '';
-    let splite = lastPurchaseId.split('-');
-    let lastno = splite[2];
-    let lastdate = splite[0] + '-' + splite[1]; // findout last purchase year and month
-
-    // const date = new Date(); // use this for auto pick today date
-    const date = new Date(buydate);
-    let currentyear = date.getFullYear().toString();
-    let currentmonth = pad(date.getMonth() + 1);
-    let currentdate = currentyear + '-' + currentmonth; // getting present year and month
-
-    if (lastdate == currentdate) {
-        purchaseId = lastdate + '-' + (parseInt(lastno) + 1); //updating if purchase made in sam year and month
-    } else {
-        purchaseId = currentdate + "-1"; // updating if purcahse made in different year or month
-    }
-    // console.log(purchaseId);
-    return purchaseId;
-}
-const currentyearandmonth = (customdate) => {
-    const date = new Date();
-    let currentyear = date.getFullYear().toString();
-    let currentmonth = pad(date.getMonth() + 1);
-    let currentdate = currentyear + '-' + currentmonth + '-1';
-    // console.log(currentdate);
-    return currentdate;
-}
-const pad = (num) => {
-    num = num.toString();
-    if (num.length < 2) {
-        return "0" + num;
-    } else {
-        return num;
-    }
-}
 
 
-module.exports = {deletebook,getpurchasebook, getbook, getbooks, buybooks, buybook };
+module.exports = { deletebook,bookdetail, getpurchasebook, getbook, getbooks, buybooks, buybook };

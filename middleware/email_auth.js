@@ -5,16 +5,16 @@ const user = require('../modals/user_schema');
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'battlefiesta07@gmail.com',
+    user: 'BookStore07@gmail.com',
     pass: process.env.gmail_password
   }
 });
 
 const sendemail = async (receiver, message) => {
   const mailOptions = {
-    from: 'BattleFiesta <battlefiesta07@gmail.com>',
+    from: 'BookStore <BookStore07@gmail.com>',
     to: receiver,
-    subject: 'BattleFiesta || Email Verification',
+    subject: 'BookStore || Sell Alert',
     text: message
   }
 
@@ -41,9 +41,9 @@ const emailmiddleware = async (req, res, next) => {
       next();
     } else {
       const mailOptions = {
-        from: 'BattleFiesta <battlefiesta07@gmail.com>',
+        from: 'BookStore <BookStore07@gmail.com>',
         to: query.email,
-        subject: 'BattleFiesta || Email Verification',
+        subject: 'BookStore || Email Verification',
         // html: `Hi ${query.name}, please <a href="https://esport-backend.vercel.app/verify?id=${query._id}" target="_blank">Click Here</a>  to Verify your Email,   Thanks for Joining Us, from Jai kishan(Developer)`
         html: `<!DOCTYPE html>
         <html lang="en">
@@ -67,7 +67,7 @@ const emailmiddleware = async (req, res, next) => {
             <div class="main" style="width: 600px;  margin: 0 auto;">
                 <div style="color: white; border-radius: 10px; width: 100%; height: 60px; background: #2f1c6a; text-align: center;">
                     <h2 style="display: inline-block; vertical-align: middle; height: 100%; width: 60px; line-height: 60px;">Battle</h2>
-                    <img src='https://res.cloudinary.com/dusxlxlvm/image/upload/v1709654642/battlefiesta/assets/logo/logopng250_vuhy4f.webp' alt="" style="border-radius: 50%; width: 60px; height: 60px; display: inline-block; vertical-align: middle;">
+                    <img src='https://res.cloudinary.com/dusxlxlvm/image/upload/v1710221293/book_efwbft.webp' alt="" style="border-radius: 50%; width: 60px; height: 60px; display: inline-block; vertical-align: middle;">
                     <h2 style="display: inline-block; vertical-align: middle; height: 100%; width: 60px; line-height: 60px;">Fiesta</h2>
                 </div>
                 <div class="bottomcontent"
@@ -77,11 +77,11 @@ const emailmiddleware = async (req, res, next) => {
                         <div
                             style="text-align: center;height: 50px; color: white;">
                             <span style="display: inline-block; height: 100%; vertical-align: middle;">-----------</span>
-                            <img src="https://res.cloudinary.com/dusxlxlvm/image/upload/v1709831601/battlefiesta/assets/email_726623_d6kbjl.png"
+                            <img src="https://res.cloudinary.com/dusxlxlvm/image/upload/v1709831601/BookStore/assets/email_726623_d6kbjl.png"
                                 alt="" style="width: 40px; height: 40px; line-height: 50px;">
                                 <span style="display: inline-block; height: 100%; vertical-align: middle;">-----------</span>
                         </div>
-                        <h3 style="color: white; text-align: center;">Thanks for Signing up with BattleFiesta!</h3>
+                        <h3 style="color: white; text-align: center;">Thanks for Signing up with BookStore!</h3>
                         <h2 style="color: white; text-align: center; margin-top: 8px;">Verify your E-mail Address</h2>
                     </div>
                     <p style="width: 100%;  font-size: 1.2em; text-align: center; letter-spacing: 0.2px; margin-top: 10px;">Hi
@@ -98,7 +98,7 @@ const emailmiddleware = async (req, res, next) => {
                             style="width: 65%; outline: none; cursor: pointer; border: none; padding: 5px; font-size: 1.2em; font-weight: 700; color: white; cursor: pointer; background: #2f1c6a; border-radius: 5px; margin-top: 20px;">Verify
                             Your Email</button></a>
                     <p style="width: 100%;font-size: 1.1em; text-align: center; letter-spacing: 0.2px; margin-top: 5px;">
-                        Thanks, BattleFiesta</p>
+                        Thanks, BookStore</p>
                     <p
                         style="width: 100%;padding-right: 10px; font-size: 0.8em; text-align: end; letter-spacing: 0.2px; margin-top: 2px;">
                         Developer - Jai Kishan Kumar</p>
@@ -106,25 +106,25 @@ const emailmiddleware = async (req, res, next) => {
                         style="margin-top: 5px; width: 100%; text-align: center; padding: 5px 0px; background: rgba(175, 173, 173, 0.644); ">
                         <a href="http://" target="_blank" rel="noopener noreferrer"  style="cursor: pointer; margin: 0 15px;"><img
                                 style="width: 30px; height: 30px; padding: 2px; border: 1px solid #2f1c6a; border-radius: 50%; background: white;"
-                                src="https://res.cloudinary.com/dusxlxlvm/image/upload/v1709879629/battlefiesta/assets/icon/facebook_5968764_aqgopi.png"
+                                src="https://res.cloudinary.com/dusxlxlvm/image/upload/v1709879629/BookStore/assets/icon/facebook_5968764_aqgopi.png"
                                 alt=""></a>
-                        <a href="https://www.instagram.com/battlefiesta" target="_blank" rel="noopener noreferrer"
+                        <a href="https://www.instagram.com/BookStore" target="_blank" rel="noopener noreferrer"
                             style="cursor: pointer; margin: 0 15px;"><img
                                 style="width: 30px; height: 30px; padding: 2px; border: 1px solid #2f1c6a; border-radius: 50%; background: white;"
-                                src="https://res.cloudinary.com/dusxlxlvm/image/upload/v1709879531/battlefiesta/assets/icon/instagram_3955024_vjrnvj.png"
+                                src="https://res.cloudinary.com/dusxlxlvm/image/upload/v1709879531/BookStore/assets/icon/instagram_3955024_vjrnvj.png"
                                 alt=""></a>
                         <a href="https://www.youtube.com/@Battle_Fiesta" target="_blank" rel="noopener noreferrer"
                         style="cursor: pointer; margin: 0 15px;"><img
                                 style="width: 30px; height: 30px; padding: 2px; border: 1px solid #2f1c6a; border-radius: 50%; background: white;"
-                                src="https://res.cloudinary.com/dusxlxlvm/image/upload/v1709879430/battlefiesta/assets/icon/youtube_3670147_sy7gii.png"
+                                src="https://res.cloudinary.com/dusxlxlvm/image/upload/v1709879430/BookStore/assets/icon/youtube_3670147_sy7gii.png"
                                 alt=""></a>
                         <a href="http://" target="_blank" rel="noopener noreferrer"  style="cursor: pointer; margin: 0 15px;"><img
                                 style="width: 30px; height: 30px; padding: 2px; border: 1px solid #2f1c6a; border-radius: 50%; background: white;"
-                                src="https://res.cloudinary.com/dusxlxlvm/image/upload/v1709879286/battlefiesta/assets/icon/email_552486_pbfpji.png"
+                                src="https://res.cloudinary.com/dusxlxlvm/image/upload/v1709879286/BookStore/assets/icon/email_552486_pbfpji.png"
                                 alt=""></a>
                     </div>
                     <footer style="background: #2f1c6a; width: 100%; text-align: center; padding: 10px 0px; color: white;">
-                        <h5 style="margin: 0;">Copyrights © BattleFiesta All Rights Reserved</h5>
+                        <h5 style="margin: 0;">Copyrights © BookStore All Rights Reserved</h5>
                     </footer>
                 </div>
             </div>

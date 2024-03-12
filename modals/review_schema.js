@@ -9,25 +9,15 @@ const reviewschema = new mongo.Schema({
         type: mongo.Schema.Types.ObjectId,
         ref: 'user',
     },
-    bookId: {
-        type: String,
-        required: true,
-        unique:true
-    },
     review: {
         type: String,
         required: true,
         unique:true
     },
     rating: {
-        type: string,
-        required: false,
-        default:'',
-    },
-    Noofrating: {
         type: Number,
         required: false,
-        default:'',
+        default:0,
     }
    
 }, { timestamps: true })
