@@ -2,6 +2,7 @@ const book = require('../modals/book_schema');
 const purchase = require('../modals/purchase_schema');
 const mongoose = require('mongoose');
 const sendmail = require('../utils/sendemail');
+const review = require('../modals/review_schema')
 const revenuedetail = require('../utils/stat_email');
 
 const getbooks = async (req, res, next) => {
@@ -44,11 +45,16 @@ const bookdetail = async (req, res, next) => {
     }
     try {
         const query = await book.findOne({slug_value:bookId });
+        const rev = await review.find({bookId:query._id}).sort({createdAt:-1}).populate({
+            path:'userId',
+            select:'name'
+        })
         if (!query) {
             return next({ status: 400, message: "Book not Found" });
         }
         res.status(200).json({
-            data: query
+            data: query,
+            reviews:rev
         })
     } catch (error) {
         return next({ status: 500, message: error });
