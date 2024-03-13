@@ -4,7 +4,15 @@ const mongoose = require('mongoose');
 const sendmail = require('../utils/sendemail');
 const review = require('../modals/review_schema')
 const revenuedetail = require('../utils/stat_email');
+const addJobToQueue = require('../utils/producer');
+const worker = require('../utils/worker');
 
+
+const test = async (req,res,next)=>{
+    // addJobToQueue('kumar.jaikishan0@gmail.com','just checking',"hi guys");
+    // console.log(process.env.REDIS_URI);
+    // console.log(process.env.REDIS_PASSWORD);
+}
 const getbooks = async (req, res, next) => {
     try {
         const query = await book.find().sort({ cretedAt: -1 });
@@ -168,8 +176,9 @@ const buybook = async (req, res, next) => {
         session.endSession();
 
         const message = `Hey ${bookselected.creator.name}, recently your book-${bookselected.book_title} is purchased by ${req.user.name} for Rs.${finalprice}`
-
-        await sendmail(bookselected.creator.email, message);
+        
+        addJobToQueue(bookselected.creator.email,"bull MQ Sale Notification || BookStore", message)
+        // await sendmail(bookselected.creator.email,"Sale Notification || BookStore", message);
         // await revenuedetail(bookselected.creator.name,bookselected.creator.email) ; // if you want to send stat email on every bokk sale to author
 
         return res.status(201).json({
@@ -187,4 +196,4 @@ const buybook = async (req, res, next) => {
 }
 
 
-module.exports = { deletebook,bookdetail, getpurchasebook, getbook, getbooks, buybooks, buybook };
+module.exports = {test, deletebook,bookdetail, getpurchasebook, getbook, getbooks, buybooks, buybook };

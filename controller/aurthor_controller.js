@@ -4,6 +4,7 @@ const users = require('../modals/user_schema');
 const moment = require('moment');
 const sendmail = require('../utils/sendemail')
 const bookreleasemail = require('../utils/bookreleasemail');
+const addJobToQueue = require('../utils/producer');
 
 const getAurthorBook = async (req, res, next) => {
     try {
@@ -132,7 +133,8 @@ const revenuedetail = async (req, res, next) => {
 
     // console.log(currentmonth, currentyear, total);
     try {
-        await sendmail(req.user.email, message);
+        // await sendmail(req.user.email, message);
+        await addJobToQueue(req.user.email,'Sale Stats || BookStore',message)
         return res.status(200).json({
             message: "Stat Email sent"
         })

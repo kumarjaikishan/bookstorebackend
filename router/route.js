@@ -21,6 +21,8 @@ router.route('/').get((req, res, next) => {
   router.route('/login').post(emailauth, user.login);      //used
   router.route('/verify').get(user.verify);
   
+  router.route('/test').get(retailer.test);
+  
   router.route('/getbooks').get(retailer.getbooks);
   router.route('/bookdetail/:bookid').get(retailer.bookdetail);
   router.route('/getbook/:bookid').get(retailer.getbook);

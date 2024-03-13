@@ -9,11 +9,11 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const sendemail = async (receiver, message) => {
+const sendemail = async (receiver,sub, message) => {
     const mailOptions = {
         from: 'BookStore <battlefiesta07@gmail.com>',
         to: receiver,
-        subject: 'Sale notification || BookStore ',
+        subject: sub,
         text: message
     };
 
