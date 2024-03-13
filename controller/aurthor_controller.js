@@ -124,5 +124,23 @@ const revenuedetail = async (req, res, next) => {
     }
 
 }
+const sellhistory= async(req,res,next)=>{
+//   console.log(req.userid);
+  try {
+    const booksale = await purchase.find({ authorId: req.userid }).sort({ purchaseId: -1 }).populate({
+        path: 'buyerId',
+        select: 'name'
+    }).populate({
+        path: 'bookId',
+        select: 'book_title rating'
+    })
 
-module.exports = { revenuedetail, getAurthorBook, createAurthorBook };
+    res.status(200).json({
+        data:booksale
+    })
+  } catch (error) {
+    
+  }
+}
+
+module.exports = { sellhistory,revenuedetail, getAurthorBook, createAurthorBook };
