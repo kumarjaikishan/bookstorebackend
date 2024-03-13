@@ -1,7 +1,9 @@
 const book = require('../modals/book_schema');
 const purchase = require('../modals/purchase_schema');
+const users = require('../modals/user_schema');
 const moment = require('moment');
 const sendmail = require('../utils/sendemail')
+const bookreleasemail = require('../utils/bookreleasemail');
 
 const getAurthorBook = async (req, res, next) => {
     try {
@@ -37,7 +39,7 @@ const createAurthorBook = async (req, res, next) => {
     book_title = book_title.replace(/\s+/g, ' ').trim().toLowerCase();
     //  console.log(book_title);
     try {
-        const checkbooktitle = await book.findOne({ book_title})
+        const checkbooktitle = await book.findOne({ book_title })
         // console.log(checkbooktitle);
         if (checkbooktitle) {
             return next({ status: 400, message: "Book Title Already Exists" });
@@ -57,8 +59,24 @@ const createAurthorBook = async (req, res, next) => {
         let slug = newtitle.replaceAll(' ', '')
         let slug2 = newtitle.replaceAll(' ', '-')
 
-        const newUser = new book({ creator: req.userid, bookId, slug_value: slug2, book_title: newtitle, author_name, price, description });
-        const result = await newUser.save();
+        const newBook = new book({ creator: req.userid, bookId, slug_value: slug2, book_title: newtitle, author_name, price, description });
+        const result = await newBook.save();
+
+        if (result) {
+            let allemails = [];
+            const usermail = await users.find({ user_type: 'retail' }, { email: 1, name: 1 });
+            usermail.map((val) => {
+                allemails.push(val.email);
+            })
+            // console.log(allemails);
+            
+            if (allemails.length > 0) {
+                for (let i = 0; i < allemails.length; i++) {
+                    const message = `Dear ${usermail[i].name}, A new book -${book_title}, has been Published, book Author- ${author_name}`;
+                    bookreleasemail(allemails[i], message);
+                }
+            }
+        }
 
         return res.status(201).json({
             msg: "Book Created"
@@ -124,23 +142,23 @@ const revenuedetail = async (req, res, next) => {
     }
 
 }
-const sellhistory= async(req,res,next)=>{
-//   console.log(req.userid);
-  try {
-    const booksale = await purchase.find({ authorId: req.userid }).sort({ purchaseId: -1 }).populate({
-        path: 'buyerId',
-        select: 'name'
-    }).populate({
-        path: 'bookId',
-        select: 'book_title rating'
-    })
+const sellhistory = async (req, res, next) => {
+    //   console.log(req.userid);
+    try {
+        const booksale = await purchase.find({ authorId: req.userid }).sort({ purchaseId: -1 }).populate({
+            path: 'buyerId',
+            select: 'name'
+        }).populate({
+            path: 'bookId',
+            select: 'book_title rating'
+        })
 
-    res.status(200).json({
-        data:booksale
-    })
-  } catch (error) {
-    
-  }
+        res.status(200).json({
+            data: booksale
+        })
+    } catch (error) {
+
+    }
 }
 
-module.exports = { sellhistory,revenuedetail, getAurthorBook, createAurthorBook };
+module.exports = { sellhistory, revenuedetail, getAurthorBook, createAurthorBook };
