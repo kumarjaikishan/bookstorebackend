@@ -10,25 +10,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const sendemail = async (receiver, message) => {
-  const mailOptions = {
-    from: 'BookStore <BookStore07@gmail.com>',
-    to: receiver,
-    subject: 'BookStore || Sell Alert',
-    text: message
-  }
-
-  // Send the email
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Error sending email:', error);
-    } else {
-      res.status(201).json({
-        msg: "Email Sent",
-      })
-    }
-  });
-}
 
 const emailmiddleware = async (req, res, next) => {
   try {

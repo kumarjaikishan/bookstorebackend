@@ -19,6 +19,7 @@ cloudinary.config({
 // *--------------------------------------
 const login = async (req, res, next) => {
     const { email, password } = req.body;
+    // console.log(email,password);
     if (!email || !password) {
         return next({ status: 400, message: "All Fields are Required" });
     }
