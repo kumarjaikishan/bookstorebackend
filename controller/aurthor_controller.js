@@ -64,26 +64,12 @@ const createAurthorBook = async (req, res, next) => {
         const result = await newBook.save();
 
         if (result) {
-            // let allemails = [];
             const usermail = await users.find({ user_type: 'retail' }, { email: 1, name: 1 });
-            // usermail.map((val) => {
-            //     allemails.push(val.email);
-            // })
-            // console.log(allemails);
-            usermail.forEach(async(user, index) => {
-                const message = `Dear ${user.name}, A new book - ${book_title}, has been Published, book Author - ${author_name}`;
-                // bookreleasemail(email, message);
-               await addJobToQueue(user.email,"New Book Release by bull",message);
+            usermail.forEach(async (user, index) => {
+                const message = `Dear ${user.name}, A new book - ${book_title}, has been Published by Author - ${author_name}, at the price of ${price}`;
+                await addJobToQueue(user.email, "New Book Release", message);
             });
-            
-            // if (allemails.length > 0) {
-            //     for (let i = 0; i < allemails.length; i++) {
-            //         const message = `Dear ${usermail[i].name}, A new book -${book_title}, has been Published, book Author- ${author_name}`;
-            //         bookreleasemail(allemails[i], message);
-            //     }
-            // }
         }
-
         return res.status(201).json({
             msg: "Book Created"
         })
@@ -139,7 +125,7 @@ const revenuedetail = async (req, res, next) => {
     // console.log(currentmonth, currentyear, total);
     try {
         // await sendmail(req.user.email, message);
-        await addJobToQueue(req.user.email,'Sale Stats || BookStore',message)
+        await addJobToQueue(req.user.email, 'Sale Stats || BookStore', message)
         return res.status(200).json({
             message: "Stat Email sent"
         })

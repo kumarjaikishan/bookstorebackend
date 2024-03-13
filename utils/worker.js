@@ -19,8 +19,9 @@ const worker = new Worker('email_queue', sendEmail, {
 });
 
 worker.on('completed', job => {
-    console.log(`${job.id} has completed`);
+    // console.log(`${job.id} has completed`);
 })
+
 worker.on('failed', (job,err) => {
     console.log('failed');
     console.log(`${job.id} has failed - ${err}`);
