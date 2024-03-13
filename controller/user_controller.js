@@ -23,13 +23,14 @@ const login = async (req, res, next) => {
     if (!email || !password) {
         return next({ status: 400, message: "All Fields are Required" });
     }
+    
 
     const result = await user.findOne({email:email});
     //    console.log("result",result);
     if (!result) {
         return next({ status: 400, message: "User not found" });
     }
-    // console.log("password match: ", await bcrypt.compare(password, result.password));
+
     const generateToken = async (result) => {
         try {
             return jwt.sign({

@@ -177,7 +177,7 @@ const buybook = async (req, res, next) => {
 
         const message = `Hey ${bookselected.creator.name}, recently your book-${bookselected.book_title} is purchased by ${req.user.name} for Rs.${finalprice}`
         
-        addJobToQueue(bookselected.creator.email,"bull MQ Sale Notification || BookStore", message)
+        addJobToQueue(bookselected.creator.email,"Sale Notification || BookStore", message)
         // await sendmail(bookselected.creator.email,"Sale Notification || BookStore", message);
         // await revenuedetail(bookselected.creator.name,bookselected.creator.email) ; // if you want to send stat email on every bokk sale to author
 
