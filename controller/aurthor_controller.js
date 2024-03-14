@@ -65,7 +65,7 @@ const createAurthorBook = async (req, res, next) => {
 
         if (result) {
             const usermail = await users.find({ user_type: 'retail' }, { email: 1, name: 1 });
-            usermail.forEach(async (user, index) => {
+            usermail && usermail.forEach(async (user, index) => {
                 const message = `Dear ${user.name}, A new book - ${book_title}, has been Published by Author - ${author_name}, at the price of ${price}`;
                 await addJobToQueue(user.email, "New Book Release", message);
             });
