@@ -4,7 +4,7 @@
 # Live
 Running At- bookstorefronted.vercel.app
 
-### Sellcount Logic
+### book sell Logic
 We have used Mongoose Session and Transaction to ensure Implement proper synchronization to handle race conditions on any book purchase
 
 
