@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const user = require('../modals/user_schema');
+const addJobToQueue = require('../utils/producer');
 
 // Create a transporter using Gmail SMTP
 const transporter = nodemailer.createTransport({
@@ -14,9 +15,7 @@ const transporter = nodemailer.createTransport({
 const emailmiddleware = async (req, res, next) => {
   try {
     const query = await user.findOne({ email: req.body.email });
-    console.log("email auth",query);
     if (!query) {
-      console.log("yaha aaya hai");
       return next({ status: 400, message: "User not found" });
     }
     if (query.isverified) {

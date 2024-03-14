@@ -19,8 +19,8 @@ router.route('/').get((req, res, next) => {
     })
   })
   
-  router.route('/signup').post(user.signup, emailauth);    //used
-  router.route('/login').post(emailauth, user.login);      //used
+  router.route('/signup').post(user.signup, emailauth); 
+  router.route('/login').post(emailauth, user.login);
   router.route('/verify').get(user.verify);
   
   router.route('/getbooks').get(retailer.getbooks);

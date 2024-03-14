@@ -26,12 +26,9 @@ const login = async (req, res, next) => {
     
     
     const result = await user.findOne({email:email});
-      //  console.log(result);
+      //  console.log('result',result);
     if (!result) {
-        // return next({ status: 400, message: "User not found" });
-        return res.status(400).json({
-          message:'user not found'
-        })
+        return next({ status: 400, message: "User not found" });
     }
 
     const generateToken = async (result) => {
