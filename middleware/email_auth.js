@@ -6,7 +6,7 @@ const addJobToQueue = require('../utils/producer');
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'BookStore07@gmail.com',
+    user: 'battlefiesta07@gmail.com',
     pass: process.env.gmail_password
   }
 });
