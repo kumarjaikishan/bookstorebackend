@@ -122,7 +122,7 @@ const emailmiddleware = async (req, res, next) => {
           res.status(201).json({
             msg: "Verify Email, check your inbox",
           })
-          console.log('Email sent:', info.response);
+          // console.log('Email sent:', info.response);
         }
       });
     }
