@@ -75,7 +75,7 @@ const emailmiddleware = async (req, res, next) => {
                         exclusive features with us!</p>
                     <a href="storebackend01.vercel.app/api/verify?id=${query._id}" target="_blank"
                         ><button
-                            style="width: 65%; outline: none; cursor: pointer; border: none; padding: 5px; font-size: 1.2em; font-weight: 700; color: white; cursor: pointer; background: #2f1c6a; border-radius: 5px; margin-top: 20px;">Verify
+                            style="width: 65%; outline: none; cursor: pointer; border: none; padding: 15px; font-size: 1.2em; font-weight: 700; color: white; cursor: pointer; background: #2f1c6a; border-radius: 5px; margin-top: 20px;">Verify
                             Your Email</button></a>
                     <p style="width: 100%;font-size: 1.1em; text-align: center; letter-spacing: 0.2px; margin-top: 5px;">
                         Thanks, BookStore</p>
