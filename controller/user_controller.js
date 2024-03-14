@@ -417,7 +417,7 @@ const verify = async (req, res) => {
                       <p id='message'>
                         Congratulations <span id='naam'> ${query.name} </span>, your account has been successfully Verified.
                       </p>
-                      <a href="https://battlefiesta.vercel.app/login" id="contBtn">Continue SignIn</a>
+                      <a href="https://bookstorefronted.vercel.app//login" id="contBtn">Continue SignIn</a>
                     </div>
                   </div>
         
