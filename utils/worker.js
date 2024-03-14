@@ -9,7 +9,7 @@ const sendEmailhelper = async (n) => {
 async function sendEmail(job) {
         const { email, subject, body } = job.data;
         await sendmail(email, subject, body);
-        await sendEmailhelper(2);
+        await sendEmailhelper(1);
 }
 
 const worker = new Worker('email_queue', sendEmail, {

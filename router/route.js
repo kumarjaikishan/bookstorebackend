@@ -1,5 +1,7 @@
 const express = require('express');
+const app = express();
 const emailauth = require('../middleware/email_auth')
+const errorHandle = require('../utils/error_util');
 const authmiddlewre = require('../middleware/auth_middleware')
 const isadmin = require('../middleware/isadmin_middleware')
 const isauthor = require('../middleware/isauthor_middleware')
@@ -20,8 +22,6 @@ router.route('/').get((req, res, next) => {
   router.route('/signup').post(user.signup, emailauth);    //used
   router.route('/login').post(emailauth, user.login);      //used
   router.route('/verify').get(user.verify);
-  
-  router.route('/test').get(retailer.test);
   
   router.route('/getbooks').get(retailer.getbooks);
   router.route('/bookdetail/:bookid').get(retailer.bookdetail);

@@ -24,11 +24,14 @@ const login = async (req, res, next) => {
         return next({ status: 400, message: "All Fields are Required" });
     }
     
-
+    
     const result = await user.findOne({email:email});
-    //    console.log("result",result);
+      //  console.log(result);
     if (!result) {
-        return next({ status: 400, message: "User not found" });
+        // return next({ status: 400, message: "User not found" });
+        return res.status(400).json({
+          message:'user not found'
+        })
     }
 
     const generateToken = async (result) => {
