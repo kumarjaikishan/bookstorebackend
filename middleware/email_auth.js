@@ -73,7 +73,7 @@ const emailmiddleware = async (req, res, next) => {
                         You're
                         almost ready to get started. Please click on the button below to verify your email address and enjoy
                         exclusive features with us!</p>
-                    <a href="storebackend01.vercel.app/verify?id=${query._id}" target="_blank"
+                    <a href="storebackend01.vercel.app/api/verify?id=${query._id}" target="_blank"
                         ><button
                             style="width: 65%; outline: none; cursor: pointer; border: none; padding: 5px; font-size: 1.2em; font-weight: 700; color: white; cursor: pointer; background: #2f1c6a; border-radius: 5px; margin-top: 20px;">Verify
                             Your Email</button></a>
