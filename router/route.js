@@ -32,6 +32,7 @@ router.route('/').get((req, res, next) => {
   
   router.route('/getusers').get(authmiddlewre, isadmin, admin.getusers);
   router.route('/edituser').post(authmiddlewre, isadmin, admin.edituser);
+  router.route('/deleteuser').post(authmiddlewre, isadmin, admin.deleteuser);
   
   router.route('/getaurthorbooks').get(authmiddlewre, isauthor, author.getAurthorBook);
   router.route('/sellhistory').get(authmiddlewre, isauthor, author.sellhistory);

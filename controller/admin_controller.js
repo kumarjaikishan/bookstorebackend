@@ -28,5 +28,19 @@ const edituser = async (req, res, next) => {
         return next({ status: 500, message: error });
     }
 }
+const deleteuser = async (req, res, next) => {
+    const {id}= req.body;
+    try {
+        const query = await user.findByIdAndDelete({_id:id})
+        if (!query) {
+            return next({ status: 400, message: "Not Deleted" });
+        }
+        res.status(200).json({
+           message:"User Deleted"
+        })
+    } catch (error) {
+        return next({ status: 500, message: error });
+    }
+}
 
-module.exports = {getusers,edituser};
+module.exports = {getusers,edituser,deleteuser};
