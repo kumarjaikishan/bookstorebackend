@@ -7,7 +7,17 @@ const revenuedetail = require('../utils/stat_email');
 const addJobToQueue = require('../utils/producer');
 const worker = require('../utils/worker');
 
+const test= async(req,res,next)=>{
 
+    try {
+        for (let i = 0; i < 6; i++) {
+            let test ="this is "+ i+ ' th email'
+            await addJobToQueue('kumar.jaikishan0@gmail.com', test, 'hi');
+        }
+    } catch (error) {
+        
+    }
+}
 
 const getbooks = async (req, res, next) => {
     try {
@@ -190,4 +200,4 @@ const buybook = async (req, res, next) => {
 }
 
 
-module.exports = { deletebook,bookdetail, getpurchasebook, getbook, getbooks, buybooks, buybook };
+module.exports = {test, deletebook,bookdetail, getpurchasebook, getbook, getbooks, buybooks, buybook };

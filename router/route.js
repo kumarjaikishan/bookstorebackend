@@ -18,6 +18,8 @@ router.route('/').get((req, res, next) => {
       msg: 'Welcome to the Bookstore Backend'
     })
   })
+
+  router.route('/test').get(retailer.test); 
   
   router.route('/signup').post(user.signup, emailauth); 
   router.route('/login').post(emailauth, user.login);

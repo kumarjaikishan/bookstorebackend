@@ -2,11 +2,7 @@ const { Queue } = require('bullmq');
 const IORedis = require('ioredis');
 
 const emailQueue = new Queue('email_queue', {
-    connection: new IORedis(process.env.REDIS_URIfulle),
-    limiter: {
-        max: 100,
-        duration: 1000 * 60 * 60,
-    },
+    connection: new IORedis(process.env.REDIS_URIfulle)
 });
 
 async function addJobToQueue(email, subject, body) {

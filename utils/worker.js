@@ -10,12 +10,17 @@ async function sendEmail(job) {
         const { email, subject, body } = job.data;
         await sendmail(email, subject, body);
         await sendEmailhelper(1);
+        // console.log(job.id);
 }
 
 const worker = new Worker('email_queue', sendEmail, {
     connection: new IORedis(process.env.REDIS_URIfulle, {
         maxRetriesPerRequest: null,
     }),
+    limiter: {
+        max: 100,
+        duration: 1000*60*60,
+      },
 });
 
 worker.on('completed', job => {
