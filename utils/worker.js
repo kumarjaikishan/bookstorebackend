@@ -9,7 +9,7 @@ const sendEmailhelper = async (n) => {
 async function sendEmail(job) {
         const { email, subject, body } = job.data;
         await sendmail(email, subject, body);
-        await sendEmailhelper(1);
+        await sendEmailhelper(10);
         // console.log(job.id);
 }
 
