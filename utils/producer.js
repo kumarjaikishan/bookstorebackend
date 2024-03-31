@@ -11,7 +11,7 @@ async function addJobToQueue(email, subject, body) {
         subject,
         body
     })
-    // console.log("job added to queue", res.id);
+    console.log("job added to queue", res.id);
 }
 
 module.exports = addJobToQueue;

@@ -23,9 +23,11 @@ const sendemail = async (receiver,sub, message) => {
             if (error) {
                 console.error('Error sending email:', error);
                 // Reject the promise with the error
+                // console.log("error:",error);
                 reject(error);
             } else {
                 // Resolve the promise with true
+                // console.log("Email Sent successfully");
                 resolve(true);
             }
         });

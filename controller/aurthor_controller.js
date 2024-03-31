@@ -98,16 +98,11 @@ const revenuedetail = async (req, res, next) => {
     const startOfYear = currentDate3.startOf('year');
     const endOfYear = currentDate4.endOf('year');
 
-    // Format the dates if needed
     const formattedStartOfMonth = startOfMonth.format('YYYY-MM-DD');
     const formattedEndOfMonth = endOfMonth.format('YYYY-MM-DD');
     const formattedstartofyear = startOfYear.format('YYYY-MM-DD');
     const formattedEndofyear = endOfYear.format('YYYY-MM-DD');
 
-    // console.log('Start of the current month:', formattedStartOfMonth);
-    // console.log('End of the current month:', formattedEndOfMonth);
-    // console.log('start of the current year:', formattedstartofyear);
-    // console.log('End of the current year:', formattedEndofyear);
 
     query.map((val, ind) => {
         if (val.purchaseDate >= formattedStartOfMonth && val.purchaseDate <= formattedEndOfMonth) {

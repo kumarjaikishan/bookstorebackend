@@ -6,16 +6,22 @@ const review = require('../modals/review_schema')
 const revenuedetail = require('../utils/stat_email');
 const addJobToQueue = require('../utils/producer');
 const worker = require('../utils/worker');
+const qr = require('qrcode');
 
-const test= async(req,res,next)=>{
-
+const test = async (req, res, next) => {
+    console.log("aaya");
     try {
-        for (let i = 0; i < 6; i++) {
-            let test ="this is "+ i+ ' th email'
-            await addJobToQueue('kumar.jaikishan0@gmail.com', test, 'hi');
-        }
+        // for (let i = 0; i < 6; i++) {
+        //     let test ="this is "+ i+ ' th email'
+        //     await addJobToQueue('kumar.jaikishan0@gmail.com', test, 'hi');
+        // }
+        const stringData = JSON.stringify('');
+        qr.toString('upi://pay?pa=battlefiesta0@ybl&pn=BATTLE FIESTA&am=299&tn=BattleFiesta-1 Week plan&cu=INR', { type: 'terminal' }, function (err, code) {
+            if (err) return console.log(err);
+            console.log(code);
+        })
     } catch (error) {
-        
+
     }
 }
 
@@ -58,17 +64,17 @@ const bookdetail = async (req, res, next) => {
         return next({ status: 400, message: "please send book ID" });
     }
     try {
-        const query = await book.findOne({slug_value:bookId });
-        const rev = await review.find({bookId:query._id}).sort({createdAt:-1}).populate({
-            path:'userId',
-            select:'name'
+        const query = await book.findOne({ slug_value: bookId });
+        const rev = await review.find({ bookId: query._id }).sort({ createdAt: -1 }).populate({
+            path: 'userId',
+            select: 'name'
         })
         if (!query) {
             return next({ status: 400, message: "Book not Found" });
         }
         res.status(200).json({
             data: query,
-            reviews:rev
+            reviews: rev
         })
     } catch (error) {
         return next({ status: 500, message: error });
@@ -182,9 +188,9 @@ const buybook = async (req, res, next) => {
         session.endSession();
 
         const message = `Hey ${bookselected.creator.name}, recently your book-${bookselected.book_title} is purchased by ${req.user.name} for Rs.${finalprice}`
-        
-        addJobToQueue(bookselected.creator.email,"Sale Notification || BookStore", message)
-       
+
+        addJobToQueue(bookselected.creator.email, "Sale Notification || BookStore", message)
+
         return res.status(201).json({
             message: "Book Buy Successfully"
         })
@@ -200,4 +206,4 @@ const buybook = async (req, res, next) => {
 }
 
 
-module.exports = {test, deletebook,bookdetail, getpurchasebook, getbook, getbooks, buybooks, buybook };
+module.exports = { test, deletebook, bookdetail, getpurchasebook, getbook, getbooks, buybooks, buybook };

@@ -10,7 +10,6 @@ async function sendEmail(job) {
         const { email, subject, body } = job.data;
         await sendmail(email, subject, body);
         await sendEmailhelper(10);
-        // console.log(job.id);
 }
 
 const worker = new Worker('email_queue', sendEmail, {
@@ -24,7 +23,7 @@ const worker = new Worker('email_queue', sendEmail, {
 });
 
 worker.on('completed', job => {
-    // console.log(`${job.id} has completed`);
+    console.log(`${job.id} has completed`);
 })
 
 worker.on('failed', (job,err) => {
