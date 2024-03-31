@@ -14,7 +14,7 @@ async function sendEmail(job) {
 
 const worker = new Worker('email_queue', sendEmail, {
     connection: new IORedis(process.env.REDIS_URIfulle, {
-        maxRetriesPerRequest: 1,
+        maxRetriesPerRequest: null,
     }),
     limiter: {
         max: 100,
