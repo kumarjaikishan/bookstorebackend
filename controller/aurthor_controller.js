@@ -119,8 +119,9 @@ const revenuedetail = async (req, res, next) => {
 
     // console.log(currentmonth, currentyear, total);
     try {
+        const date = new Date();
         // await sendmail(req.user.email, message);
-        await addJobToQueue(req.user.email, 'Sale Stats || BookStore', message)
+        await addJobToQueue(req.user.email, `${date.getHours()} : ${date.getMinutes()} Sale Stats || BookStore`, message)
         return res.status(200).json({
             message: "Stat Email sent"
         })
