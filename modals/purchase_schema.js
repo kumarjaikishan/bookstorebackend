@@ -30,6 +30,14 @@ const purchaseSchema = new mongo.Schema({
         type: String,
         required: true,
     },
+    order_id: {
+        type: String,
+        required: null,
+    },
+    payment_id: {
+        type: String,
+        required: null,
+    },
     price: {
         type: Number,
         required: false,

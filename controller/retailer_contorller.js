@@ -154,18 +154,19 @@ const buybook = async (req, res, next) => {
     try {
         const latestpurchase = await purchase.findOne({ purchaseId: { $regex: `${buyyear}-${buymonth}-\\d+` } })
             .sort({ purchaseId: -1 })
-            .limit(1);
+            .limit(1)
+            .session(session);
 
         const bookselected = await book.findOne({ bookId }).populate({
             path: 'creator',
             select: 'name email'
-        }); // to findout book price
+        }).session(session); // to findout book price
         const finalprice = bookselected.price;
         const bookObjectIdId = bookselected._id
 
 
         if (coupon != "") {
-            const coupon = await coupon.findOne({ coupon }); // checking and coupon applied
+            const coupon = await coupon.findOne({ coupon }).session(session); // checking and coupon applied
             finalprice = bookselected.price - coupon.amount;
         }
 
@@ -179,10 +180,10 @@ const buybook = async (req, res, next) => {
 
 
         const newPurchase = new purchase({ authorId: bookselected.creator, bookId: bookObjectIdId, purchaseDate: buydate, bookUniqueId: bookId, buyerId: req.userid, purchaseId, price: finalprice });
-        const result = await newPurchase.save();
+        const result = await newPurchase.save({session});
 
 
-        await book.findOneAndUpdate({ bookId }, { $inc: { sellCount: 1 } }); // updating book sellcount
+        await book.findOneAndUpdate({ bookId }, { $inc: { sellCount: 1 } }).session(session); // updating book sellcount
 
         await session.commitTransaction();
         session.endSession();

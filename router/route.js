@@ -11,6 +11,7 @@ const author = require('../controller/aurthor_controller')
 const retailer = require('../controller/retailer_contorller')
 const admin = require('../controller/admin_controller')
 const review = require('../controller/review.controller')
+const razor = require('../controller/razorpay_controller')
 const router = express.Router();
 
 router.route('/').get((req, res, next) => {
@@ -24,6 +25,9 @@ router.route('/').get((req, res, next) => {
   router.route('/signup').post(user.signup, emailauth); 
   router.route('/login').post(emailauth, user.login);
   router.route('/verify').get(user.verify);
+
+  router.route('/createorder').post(razor.createorder);
+  router.route('/purchesed').post(authmiddlewre,razor.purchesed);
   
   router.route('/getbooks').get(retailer.getbooks);
   router.route('/bookdetail/:bookid').get(retailer.bookdetail);
