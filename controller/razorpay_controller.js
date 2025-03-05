@@ -8,14 +8,14 @@ const createorder = async (req, res, next) => {
             key_id: process.env.RAZORPAY_KEY_ID,
             key_secret: process.env.RAZORPAY_KEY_SECRET,
         });
-        
+
         if (!req.body) {
             return res.status(400).json({ message: 'Bad request' });
         }
-        
+
         const options = req.body;
         const order = await razorpay.orders.create(options);
-        
+
         if (!order) {
             return next({ status: 400, message: "Order not created" });
         }
@@ -27,7 +27,7 @@ const createorder = async (req, res, next) => {
 };
 
 const purchesed = async (req, res, next) => {
-    console.log('body',req.body);
+    // console.log('razorpay ke purchased me');
     const { bookId, objectid, order_id, payment_id, date } = req.body;
 
     const datee = new Date(date);
@@ -38,7 +38,6 @@ const purchesed = async (req, res, next) => {
         const latestpurchase = await purchase.findOne({ purchaseId: { $regex: `${buyyear}-${buymonth}-\\d+` } })
             .sort({ purchaseId: -1 })
             .limit(1);
-
         const bookselected = await book.findOne({ bookId }).populate({
             path: 'creator',
             select: 'name email'
@@ -63,8 +62,11 @@ const purchesed = async (req, res, next) => {
             price: bookselected.price
         });
         const result = await newPurchase.save();
+        const increm = await book.findOneAndUpdate({ bookId }, { $inc: { sellCount: 1 } });
+        // console.log("increm",increm)
 
         return res.status(200).json(result);
+
     } catch (error) {
         return next({ status: 500, message: error });
     }

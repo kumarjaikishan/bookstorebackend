@@ -27,18 +27,39 @@ const test = async (req, res, next) => {
 
 const getbooks = async (req, res, next) => {
     try {
-        const query = await book.find().sort({ cretedAt: -1 });
-        if (!query) {
+        console.log(req.userid);
+
+        let query = await book.find().sort({ createdAt: -1 }); // Fix typo in `createdAt`
+
+        if (!query || query.length === 0) {
             return next({ status: 400, message: "Books not found" });
         }
-        res.status(200).json({
-            data: query
-        })
+
+        if (!req.userid) {
+            // If no user ID is provided, return all books as usual
+            return res.status(200).json({ data: query });
+        }
+
+        // Fetch books the user has purchased
+        const bookPurchased = await purchase.find({ buyerId: req.userid }).select('bookId');
+        const purchasedBookIds = new Set(bookPurchased.map((val) => val.bookId.toString())); // Use Set for fast lookup
+
+        // Add purchase status to each book
+        const booksWithStatus = query.map((book) => {
+            let bookObj = book.toObject(); // Convert Mongoose doc to plain object
+            bookObj.purchased = purchasedBookIds.has(book._id.toString()); // Check if purchased
+            return bookObj;
+        });
+
+        res.status(200).json({ data: booksWithStatus });
+
     } catch (error) {
-        console.log(error);
-        return next({ status: 500, message: error });
+        console.error("Error fetching books:", error);
+        return next({ status: 500, message: "Internal Server Error" });
     }
-}
+};
+
+
 const getbook = async (req, res, next) => {
     const bookId = req.params.bookid;
     // console.log('Book ID:', bookId);
@@ -59,7 +80,7 @@ const getbook = async (req, res, next) => {
 }
 const bookdetail = async (req, res, next) => {
     const bookId = req.params.bookid;
-    console.log('Book ID:', bookId);
+    // console.log('Book ID:', bookId);
     if (bookId == "") {
         return next({ status: 400, message: "please send book ID" });
     }
@@ -72,8 +93,18 @@ const bookdetail = async (req, res, next) => {
         if (!query) {
             return next({ status: 400, message: "Book not Found" });
         }
-        res.status(200).json({
-            data: query,
+        if (!req.userid) {
+            return res.status(200).json({
+                data: query,
+                reviews: rev
+            })
+        }
+        const bookPurchased = await purchase.find({ buyerId: req.userid, bookId: query._id }).select('bookId');
+        // console.log(bookPurchased)
+        let editstats = query.toObject();
+        editstats.purchased = bookPurchased.length > 0;
+        return res.status(200).json({
+            data: editstats,
             reviews: rev
         })
     } catch (error) {
@@ -135,6 +166,7 @@ const getpurchasebook = async (req, res, next) => {
 }
 
 const buybook = async (req, res, next) => {
+    // console.log("simple buybook me")
     const bookId = req.params.bookid;
     const coupon = req.body.coupon;
     const buydate = req.body.date;
@@ -164,7 +196,6 @@ const buybook = async (req, res, next) => {
         const finalprice = bookselected.price;
         const bookObjectIdId = bookselected._id
 
-
         if (coupon != "") {
             const coupon = await coupon.findOne({ coupon }).session(session); // checking and coupon applied
             finalprice = bookselected.price - coupon.amount;
@@ -178,19 +209,19 @@ const buybook = async (req, res, next) => {
         const purchaseId = `${buyyear}-${buymonth}-${increment}`;
         // console.log("purchase iD",purchaseId);
 
-
         const newPurchase = new purchase({ authorId: bookselected.creator, bookId: bookObjectIdId, purchaseDate: buydate, bookUniqueId: bookId, buyerId: req.userid, purchaseId, price: finalprice });
-        const result = await newPurchase.save({session});
+        const result = await newPurchase.save({ session });
 
 
-        await book.findOneAndUpdate({ bookId }, { $inc: { sellCount: 1 } }).session(session); // updating book sellcount
+       const incrementhua= await book.findOneAndUpdate({ bookId }, { $inc: { sellCount: 1 } }, { session }) 
+    //    console.log("incrementhua :",incrementhua)
 
         await session.commitTransaction();
         session.endSession();
 
         const message = `Hey ${bookselected.creator.name}, recently your book-${bookselected.book_title} is purchased by ${req.user.name} for Rs.${finalprice}`
 
-        addJobToQueue(bookselected.creator.email, "Sale Notification || BookStore", message)
+        // addJobToQueue(bookselected.creator.email, "Sale Notification || BookStore", message)
 
         return res.status(201).json({
             message: "Book Buy Successfully"

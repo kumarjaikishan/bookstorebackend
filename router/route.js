@@ -3,9 +3,9 @@ const app = express();
 const emailauth = require('../middleware/email_auth')
 const errorHandle = require('../utils/error_util');
 const authmiddlewre = require('../middleware/auth_middleware')
-const isadmin = require('../middleware/isadmin_middleware')
-const isauthor = require('../middleware/isauthor_middleware')
+const islogin = require('../middleware/islogin_middleware')
 const isretailer = require('../middleware/isretailer_middleware')
+const roleMidleware = require('../middleware/role_middleware')
 const user = require('../controller/user_controller')
 const author = require('../controller/aurthor_controller')
 const retailer = require('../controller/retailer_contorller')
@@ -29,21 +29,23 @@ router.route('/').get((req, res, next) => {
   router.route('/createorder').post(razor.createorder);
   router.route('/purchesed').post(authmiddlewre,razor.purchesed);
   
-  router.route('/getbooks').get(retailer.getbooks);
-  router.route('/bookdetail/:bookid').get(retailer.bookdetail);
+  router.route('/getbooks').get(islogin,retailer.getbooks);
+  router.route('/bookdetail/:bookid').get(islogin,retailer.bookdetail);
   router.route('/getbook/:bookid').get(retailer.getbook);
   router.route('/buybook/:bookid').post(authmiddlewre, retailer.buybook);
   router.route('/deletebook').post(retailer.deletebook);
   router.route('/getpurchasebook').get(authmiddlewre, retailer.getpurchasebook);
   
-  router.route('/getusers').get(authmiddlewre, isadmin, admin.getusers);
-  router.route('/edituser').post(authmiddlewre, isadmin, admin.edituser);
-  router.route('/deleteuser').post(authmiddlewre, isadmin, admin.deleteuser);
+  // router.route('/getusers').get(authmiddlewre, isadmin, admin.getusers);
+  router.route('/getusers').get(authmiddlewre, roleMidleware(['admin']), admin.getusers);
+  router.route('/edituser').post(authmiddlewre, roleMidleware(['admin']), admin.edituser);
+  router.route('/deleteuser').post(authmiddlewre, roleMidleware(['admin']), admin.deleteuser);
   
-  router.route('/getaurthorbooks').get(authmiddlewre, isauthor, author.getAurthorBook);
-  router.route('/sellhistory').get(authmiddlewre, isauthor, author.sellhistory);
-  router.route('/revenuedetail').get(authmiddlewre, isauthor, author.revenuedetail);
-  router.route('/createaurthorbooks').post(authmiddlewre, isauthor, author.createAurthorBook);
+  // router.route('/getaurthorbooks').get(authmiddlewre, isauthor, author.getAurthorBook);
+  router.route('/getaurthorbooks').get(authmiddlewre, roleMidleware(['admin','author']), author.getAurthorBook);
+  router.route('/sellhistory').get(authmiddlewre, roleMidleware(['admin','author']), author.sellhistory);
+  router.route('/revenuedetail').get(authmiddlewre, roleMidleware(['admin','author']), author.revenuedetail);
+  router.route('/createaurthorbooks').post(authmiddlewre, roleMidleware(['admin','author']), author.createAurthorBook);
   
   router.route('/bookreview').post(authmiddlewre,isretailer, review.bookreview);
 
