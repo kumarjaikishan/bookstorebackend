@@ -67,7 +67,7 @@ const createAurthorBook = async (req, res, next) => {
             const usermail = await users.find({ user_type: 'retail' }, { email: 1, name: 1 });
             usermail && usermail.forEach(async (user, index) => {
                 const message = `Dear ${user.name}, A new book - ${book_title}, has been Published by Author - ${author_name}, at the price of ${price}`;
-                await addJobToQueue(user.email, "New Book Release", message);
+                // await addJobToQueue(user.email, "New Book Release", message);
             });
         }
         return res.status(201).json({
@@ -120,8 +120,8 @@ const revenuedetail = async (req, res, next) => {
     // console.log(currentmonth, currentyear, total);
     try {
         const date = new Date();
-        // await sendmail(req.user.email, message);
-        await addJobToQueue(req.user.email, `${date.getHours()} : ${date.getMinutes()} Sale Stats || BookStore`, message)
+        // await sendmail(req.user.email, message); //purana method
+        // await addJobToQueue(req.user.email, `${date.getHours()} : ${date.getMinutes()} Sale Stats || BookStore`, message)
         return res.status(200).json({
             message: "Stat Email sent"
         })
